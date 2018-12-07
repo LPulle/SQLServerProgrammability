@@ -102,19 +102,9 @@ GO
 ENABLE TRIGGER DDLTrigger ON DATABASE
 GO
 
--- Remove specific entry from DDLEvents table
+-- Below is if you want to remove a specific entry from DDLEvents table
 DECLARE @DDLID INT = 'Enter ID number here'
 DELETE FROM dbo.DDLEvents WHERE ID = @DDLID
 -- Reseed the Identity ID field on DDLEvents
 DECLARE @reseed INT = (SELECT MAX(ID) FROM dbo.DDLEvents)
 DBCC CHECKIDENT ([DDLEvents], RESEED, @reseed)
-
--- Check for ID sequence issues
-DECLARE @MaxID INT = (SELECT MAX(ID) FROM dbo.DDLEvents), @i INT = 1
-DECLARE @AllIDs TABLE (ID INT)
-WHILE @MaxID >= @i
-	BEGIN 
-	INSERT INTO @AllIDs
-		SELECT @i
-		SET @i += 1
-	END

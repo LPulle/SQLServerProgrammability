@@ -4,50 +4,49 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /*------------------------------------------------------------------------------------------------------ 
-Description   : Identifies tables over a certain size for specific databases
-			  Parameter @AllowCompress is set to 1 by default and will result
-				in any tables found being compressed. If set to 0 will simply
-				report back that tables have been found that can be compressed.
-				Compression is done as PAGE rather than ROW level.
-				Tables will be rebuilt with this using an alter table statement.
-				Threshold is set to 100mb by default but can be changed in the
-				parameter @thresholdsize
+Description  	Identifies tables over a certain size for specific databases
+		Parameter @AllowCompress is set to 1 by default and will result
+		in any tables found being compressed. If set to 0 will simply
+		report back that tables have been found that can be compressed.
+		Compression is done as PAGE rather than ROW level.
+		Tables will be rebuilt with this using an alter table statement.
+		Threshold is set to 100mb by default but can be changed in the
+		parameter @thresholdsize
 
-Usgage: EXEC dbo.CompressTables
-				EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 100
-				EXEC dbo.CompressTables @AllowCompress = 0
-				EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 300
-				EXEC dbo.CompressTables @AllowCompress = 0, @thresholdsize = 300
+Usgage: 	EXEC dbo.CompressTables
+		EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 100
+		EXEC dbo.CompressTables @AllowCompress = 0
+		EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 300
+		EXEC dbo.CompressTables @AllowCompress = 0, @thresholdsize = 300
 
                  
-Date			    Version		Author		        Comment
+Date			Version		Author 		Comment
 ---------------------------------------------------------------------------------------------------------
-10-Jul-2017	   	 1.0		LP				First version
-27-Jul-2017		 1.1		LP				Added @thresholdsize Added description and documentation
-01-Aug-2017		 1.2		LP				Added WITH(NOLOCK) to system tables (prevent locking)
-06-Dec-2018		 1.3		LP				Changed population of #TableCompress to use while loop
+10-Jul-2017	   	 1.0		LP		First version
+27-Jul-2017		 1.1		LP		Added @thresholdsize Added description and documentation
+01-Aug-2017		 1.2		LP		Added WITH(NOLOCK) to system tables (prevent locking)
+06-Dec-2018		 1.3		LP		Changed population of #TableCompress to use while loop
 
 --------------------------------------------------------------------------------------------------------- */
-CREATE PROCEDURE [dbo].[CompressTables] (
-      @AllowCompress INT = 1, @thresholdsize INT = 100) 
-AS
+CREATE PROCEDURE dbo.CompressTables (
+      @AllowCompress INT = 1, @thresholdsize INT = 100) AS
 BEGIN
-	SET NOCOUNT ON
 
+SET NOCOUNT ON
 -- Threshold for table size >= this size will be compressed
 	DECLARE 
-			@threshold INT = @thresholdsize
-			,@Compress INT = @AllowCompress;
+		@threshold INT = @thresholdsize
+		,@Compress INT = @AllowCompress;
 
 -- Variables for loop
 	DECLARE @Databases TABLE (DatabaseID INT IDENTITY, DatabaseName VARCHAR(100));
 	DECLARE 
-			@DbName VARCHAR(100)
-			,@sqlcommand1 VARCHAR(MAX)
-			,@i INT
-			,@j INT
-      ,@sqlcommand VARCHAR(MAX)
-      ,@Table VARCHAR(MAX);
+		@DbName VARCHAR(100)
+		,@sqlcommand1 VARCHAR(MAX)
+		,@i INT
+		,@j INT
+      		,@sqlcommand VARCHAR(MAX)
+      		,@Table VARCHAR(MAX);
 
 -- Create a table for storing table information
 IF OBJECT_ID('tempdb..#TablesCompress') IS NOT NULL DROP TABLE #TablesCompress
@@ -126,23 +125,22 @@ DELETE FROM #TablesCompress WHERE TotalSpaceMB < @thresholdsize;
 				RAISERROR('Tables can be Compressed ... %i', 0, 1, @Compress)  WITH NOWAIT;
 			END
 		IF @Compress = 1
-			BEGIN
-				-- loop from min to max TableID from the table
-        -- reuse @i and @j as variables
-				SET @i = (SELECT MIN(TableID) FROM #TablesCompress);
-				SET @j = (SELECT MAX(TableID) FROM #TablesCompress);
-
-				-- Start Loop to compress tables
-				WHILE @i <= @j
-					BEGIN
-						SET @sqlcommand = (SELECT SQLStatement FROM #TablesCompress WHERE TableID = @i)
-						-- Execute the command
-						SET @Table = (SELECT TableName FROM #TablesCompress WHERE TableID = @i)
-						RAISERROR('Compressing Table ... %s', 0, 1, @Table) WITH NOWAIT;
-						EXEC(@sqlcommand)
-						SET @i += 1
-					END;
-				RAISERROR('Tables Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
-			END;
+		BEGIN
+			-- loop from min to max TableID from the table
+        		-- reuse @i and @j as variables
+			SET @i = (SELECT MIN(TableID) FROM #TablesCompress);
+			SET @j = (SELECT MAX(TableID) FROM #TablesCompress);
+			-- Start Loop to compress tables
+			WHILE @i <= @j
+				BEGIN
+					SET @sqlcommand = (SELECT SQLStatement FROM #TablesCompress WHERE TableID = @i)
+					-- Execute the command
+					SET @Table = (SELECT TableName FROM #TablesCompress WHERE TableID = @i)
+					RAISERROR('Compressing Table ... %s', 0, 1, @Table) WITH NOWAIT;
+					EXEC(@sqlcommand)
+					SET @i += 1
+				END;
+			RAISERROR('Tables Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
+		END;
 	END;
 END

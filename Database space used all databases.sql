@@ -1,13 +1,13 @@
 /*------------------------------------------------------------------------------------------------------ 
-Description   : Identify all databases on SQL Server
-				List all tables, compression type and space used for each
-				Uses undocumented sp_MSforeachdb function
-				Could take a long time for Servers with a lot of databases and tables
+Description   	Identify all databases on SQL Server
+		List all tables, compression type and space used for each
+		Uses undocumented sp_MSforeachdb function
+		Could take a long time for Servers with a lot of databases and tables
                  
-Date			Version		Author		Comment
+Date		Version		Author		Comment
 ---------------------------------------------------------------------------------------------------------
-06-Jul-2017	    1.0			LP			First version
-07-Dec-2018		1.1			LP			Tidy up for sharing
+06-Jul-2017	1.0		LP		First version
+07-Dec-2018	1.1		LP		Tidy up for sharing
 --------------------------------------------------------------------------------------------------------- */
 
 -- Suppress Counts
@@ -71,7 +71,7 @@ CREATE TABLE #Tables (
 
 RAISERROR('Identifying all tables and space used ...', 0, 1) WITH NOWAIT;
 SET @sqlcommand1 = 
-'use [?]; INSERT INTO #Tables 
+'USE [?]; INSERT INTO #Tables 
 SELECT Db_Name() AS DatabaseName, t.name AS TableName, p.partition_number, 
 p.data_compression_desc, SUM(a.total_pages) * 8 / 1024 AS TotalSpaceMB
 FROM sys.partitions AS p

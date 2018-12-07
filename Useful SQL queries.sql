@@ -1,7 +1,8 @@
---syntax for 2 digit month (mm include leading 0 when m<10)
+-- 2 digit month (mm include leading 0 when m<10)
 REPLACE(STR(DATEPART(mm, ActivityDate), 2), ' ', '0')
 
---year month syntax yyyy-mm
+-- year month syntax yyyy-mm
+-- 2 methods: 1) Construct with CAST, STR, DATEPART 2) CONVERT function
 year_month = CAST(DATEPART(YEAR, ActivityDate) as CHAR(4))+ '-'+
 CAST(REPLACE(STR(DATEPART(mm, ActivityDate), 2), ' ', '0') as CHAR(2))
 year_month 
@@ -9,7 +10,7 @@ year_month
 alternative:
 year_month = CONVERT(VARCHAR(7), GETDATE(), 121)
 
---next_day(sunday) equivalence
+-- Increase date to the next available Sunday except when day is already a Sunday then  use that date
 CASE 
 WHEN DATENAME(WEEKDAY, ActivityDate) = 'Sunday' 
 	THEN LEFT(CAST(ActivityDate AS DATE),10)
@@ -18,15 +19,14 @@ WHEN DATENAME(WEEKDAY, ActivityDate) = 'Sunday'
 END AS WeekEnding
 
 
---Take the timestamp off a datetime field to just leave the date 
---For Sql Server 2008 and later:
+-- Remove the timestamp in a datetime field to just leave the date
+-- For Sql Server 2008 and later:
 CAST(GETDATE() As Date) 
 
---For Sql Server pre 2008:
+-- For Sql Server pre 2008 where the above doesn't work:
 DATEADD(dd, DATEDIFF(dd,0, GETDATE()), 0) 
 
-
---object names in database plus counts and view description
+-- List all objects in database including counts and module description when object is a view/function/stored proc
 SELECT
 o.object_id, 
 s.name AS SchemaName, 
@@ -44,12 +44,12 @@ WHERE
 	s.name <> 'sys'
 
 
---sp_help
---Get information on a table
+-- sp_help
+-- Get information on a table
 USE tempdb
 EXEC sp_help 'sys.all_objects'
 
---For temp tables 
+-- For temp tables you need to specify sp_help function from tempdb
 tempdb..sp_help '#temp'
 
 -- List all databases and schemas on server
@@ -62,7 +62,9 @@ Order BY [name] FOR XML PATH(''),type).value('.','nvarchar(max)'),1,12,'')
 SET @SQL = @SQL + ' ORDER BY DbName, Schema_Name'
 EXECUTE (@SQL)
 
--- Active SQL sessions and who is the owner
+-- Active SQL sessions and who initiated the query
+-- Commented fields give the command and query plan 
+-- To include you need to uncomment the relevant cross apply statements aswell
 SELECT  
 S.session_id, @@SPID, S.host_name, S.program_name, S.login_name, 
 R.request_id, ERQ.status, ERQ.command, ERQ.sql_handle, ERQ.blocking_session_id, 
