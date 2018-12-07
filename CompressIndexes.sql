@@ -4,7 +4,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /*------------------------------------------------------------------------------------------------------ 
-Author        : Laurence Pulle
 Description   : Identifies Indexes that are not compressed and compresses them
 				Tables where the indexes aren't compressed makes them continue to appear in CompressTables.sql
 				This is even if the table is compressed as it looks like something is still not compressed
