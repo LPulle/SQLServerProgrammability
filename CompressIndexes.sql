@@ -13,10 +13,10 @@ Description   : Identifies Indexes that are not compressed and compresses them
 Usgage		  : EXEC dbo.CompressIndexes
 
                  
-Date			    Version		Author		          Comment
+Date			Version		Author		 	Comment
 ---------------------------------------------------------------------------------------------------------
-24-Jul-2018	     1.0		Laurence Pulle			First version
-06-Dec-2018		    1.1		Laurence Pulle			Changed population of #IndexCompress to while loop
+24-Jul-2018	     	1.0		LP			First version
+06-Dec-2018		1.1		LP			Changed population of #IndexCompress to while loop
 --------------------------------------------------------------------------------------------------------- */
 
 ALTER PROC [dbo].[CompressIndexes] AS 
