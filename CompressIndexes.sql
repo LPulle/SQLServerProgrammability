@@ -70,11 +70,14 @@ BEGIN
 		s.name AS DatabaseSchema,
 		p.data_compression, 
 		p.data_compression_desc
-		FROM 
-		IntegratedCareLinked.sys.indexes AS i WITH(NOLOCK)
-		INNER JOIN IntegratedCareLinked.sys.partitions AS p WITH(NOLOCK) ON i.object_id = p.object_id AND i.index_id = p.index_id
-		INNER JOIN IntegratedCareLinked.sys.tables AS t WITH(NOLOCK) ON t.object_id = i.object_id
-		INNER JOIN IntegratedCareLinked.sys.Schemas s WITH(NOLOCK) ON t.schema_id = s.schema_id
+		FROM '
+		+@DbName+'.sys.partitions AS p WITH(NOLOCK)
+		INNER JOIN '+@DbName+'.sys.tables AS t WITH(NOLOCK) 
+			ON t.object_id = p.object_id
+		INNER JOIN '+@DbName+'.sys.allocation_units a WITH(NOLOCK) 
+			ON p.partition_id = a.container_id
+		INNER JOIN '+@DbName+'.sys.Schemas s WITH(NOLOCK) 
+			ON t.schema_id = s.schema_id
 		WHERE 
 			p.data_compression = 0 AND
 			i.name IS NOT NULL'
