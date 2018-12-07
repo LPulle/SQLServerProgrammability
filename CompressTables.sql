@@ -79,16 +79,21 @@ BEGIN
 	@DbName +
 	+ ''' AS DatabaseName,' +
 	+' t.name AS TableName, s.name AS DatabaseSchema,
-			p.partition_number, p.data_compression_desc, SUM(a.total_pages) * 8 / 1024 AS TotalSpaceMB
-			FROM IntegratedCareLinked.sys.partitions AS p WITH(NOLOCK)
-			INNER JOIN IntegratedCareLinked.sys.tables AS t WITH(NOLOCK) ON t.object_id = p.object_id
-			INNER JOIN IntegratedCareLinked.sys.allocation_units a WITH(NOLOCK) ON p.partition_id = a.container_id
-			INNER JOIN IntegratedCareLinked.sys.Schemas s WITH(NOLOCK) ON t.schema_id = s.schema_id
-			WHERE 
-				p.data_compression_desc = ''NONE''
-			GROUP BY t.name, p.partition_number, p.data_compression_desc, s.name'
-			EXEC(@sqlcommand1)
-			SET @i += 1
+	p.partition_number, p.data_compression_desc, SUM(a.total_pages) * 8 / 1024 AS TotalSpaceMB
+	FROM '+
+	@DbName+'.sys.indexes AS i WITH(NOLOCK)
+	INNER JOIN '+@DbName+'.sys.partitions AS p WITH(NOLOCK) 
+		ON i.object_id = p.object_id AND i.index_id = p.index_id
+	INNER JOIN '+@DbName+'.sys.tables AS t WITH(NOLOCK) 
+		ON t.object_id = i.object_id
+	INNER JOIN '+@DbName+'.sys.Schemas s WITH(NOLOCK) 
+		ON t.schema_id = s.schema_id
+	WHERE 
+		p.data_compression_desc = ''NONE''
+	GROUP BY t.name, p.partition_number, p.data_compression_desc, s.name'
+		
+	EXEC(@sqlcommand1)
+	SET @i += 1
 END
 
 -- Remove tables from the temp table which are smaller than the threshold size
