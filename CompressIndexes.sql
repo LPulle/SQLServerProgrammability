@@ -12,13 +12,13 @@ Description   : Identifies Indexes that are not compressed and compresses them
 Usgage		  : EXEC dbo.CompressIndexes
 
                  
-Date			Version		Author		 	Comment
+Date			Version		Author		Comment
 ---------------------------------------------------------------------------------------------------------
-24-Jul-2018	     	1.0		LP			First version
-06-Dec-2018		1.1		LP			Changed population of #IndexCompress to while loop
+24-Jul-2018	     	1.0		LP		First version
+06-Dec-2018		1.1		LP		Changed population of #IndexCompress to while loop
 --------------------------------------------------------------------------------------------------------- */
 
-ALTER PROC [dbo].[CompressIndexes] AS 
+ALTER PROC dbo.CompressIndexes AS 
 BEGIN 
 
 SET NOCOUNT ON
@@ -26,12 +26,12 @@ SET NOCOUNT ON
 -- Variables for loop
 	DECLARE @Databases TABLE (DatabaseID INT IDENTITY, DatabaseName VARCHAR(100));
 	DECLARE 
-			@DbName VARCHAR(100)
-			,@sqlcommand1 VARCHAR(MAX)
-			,@i INT
-			,@j INT
-      ,@sqlcommand VARCHAR(MAX)
-			,@Table VARCHAR(MAX);
+		@DbName VARCHAR(100)
+		,@sqlcommand1 VARCHAR(MAX)
+		,@i INT
+		,@j INT
+      		,@sqlcommand VARCHAR(MAX)
+		,@Table VARCHAR(MAX);
 
 -- Create a table for storing table information
 IF OBJECT_ID('tempdb..#IndexesCompress') IS NOT NULL DROP TABLE #IndexesCompress
@@ -108,22 +108,20 @@ END
 	END
 
 	IF @records > 0
+	BEGIN
+		-- reuse @i and @j as variables
+		SET @i = (SELECT MIN(IndexID) FROM #IndexesCompress)
+		SET @j = (SELECT MAX(IndexID) FROM #IndexesCompress)
+		-- Start Loop
+		WHILE @i <= @j
 			BEGIN
-				-- reuse @i and @j as variables
-				SET @i = (SELECT MIN(IndexID) FROM #IndexesCompress)
-				SET @j = (SELECT MAX(IndexID) FROM #IndexesCompress)
-
-				-- Start Loop
-				WHILE @i <= @j
-					BEGIN
-						SET @sqlcommand = (SELECT SQLStatement FROM #IndexesCompress WHERE IndexID = @i)
-						-- Execute the command
-						SET @Table = (SELECT IndexName FROM #IndexesCompress WHERE IndexID = @i)
-						RAISERROR('Compressing Index ... %s', 0, 1, @Table) WITH NOWAIT;
-						EXEC(@sqlcommand)
-						SET @i += 1
-					END;
-				RAISERROR('Indexes Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
+				SET @sqlcommand = (SELECT SQLStatement FROM #IndexesCompress WHERE IndexID = @i)
+				-- Execute the command
+				SET @Table = (SELECT IndexName FROM #IndexesCompress WHERE IndexID = @i)
+				RAISERROR('Compressing Index ... %s', 0, 1, @Table) WITH NOWAIT;
+				EXEC(@sqlcommand)
+				SET @i += 1
+			END;
+		RAISERROR('Indexes Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
 	END;
-
 END
