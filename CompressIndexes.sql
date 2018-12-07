@@ -18,7 +18,7 @@ Date			Version		Author		Comment
 06-Dec-2018		1.1		LP		Changed population of #IndexCompress to while loop
 --------------------------------------------------------------------------------------------------------- */
 
-ALTER PROC dbo.CompressIndexes AS 
+CREATE PROC dbo.CompressIndexes AS 
 BEGIN 
 
 SET NOCOUNT ON
