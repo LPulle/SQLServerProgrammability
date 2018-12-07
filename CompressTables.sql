@@ -4,7 +4,6 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /*------------------------------------------------------------------------------------------------------ 
-Author        : Laurence Pulle
 Description   : Identifies tables over a certain size for specific databases
 			  Parameter @AllowCompress is set to 1 by default and will result
 				in any tables found being compressed. If set to 0 will simply
@@ -23,10 +22,10 @@ Usgage: EXEC dbo.CompressTables
                  
 Date			    Version		Author		        Comment
 ---------------------------------------------------------------------------------------------------------
-10-Jul-2017	   1.0		Laurence Pulle			First version
-27-Jul-2017		 1.1		Laurence Pulle			Added @thresholdsize Added description and documentation
-01-Aug-2017		 1.2		Laurence Pulle			Added WITH(NOLOCK) to system tables (prevent locking)
-06-Dec-2018		 1.3		Laurence Pulle			Changed population of #TableCompress to use while loop
+10-Jul-2017	   	 1.0		LP				First version
+27-Jul-2017		 1.1		LP				Added @thresholdsize Added description and documentation
+01-Aug-2017		 1.2		LP				Added WITH(NOLOCK) to system tables (prevent locking)
+06-Dec-2018		 1.3		LP				Changed population of #TableCompress to use while loop
 
 --------------------------------------------------------------------------------------------------------- */
 CREATE PROCEDURE [dbo].[CompressTables] (
