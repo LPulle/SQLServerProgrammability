@@ -80,12 +80,12 @@ BEGIN
 	+ ''' AS DatabaseName,' +
 	+' t.name AS TableName, s.name AS DatabaseSchema,
 	p.partition_number, p.data_compression_desc, SUM(a.total_pages) * 8 / 1024 AS TotalSpaceMB
-	FROM '+
-	@DbName+'.sys.indexes AS i WITH(NOLOCK)
-	INNER JOIN '+@DbName+'.sys.partitions AS p WITH(NOLOCK) 
-		ON i.object_id = p.object_id AND i.index_id = p.index_id
+	FROM '
+	+@DbName+'.sys.partitions AS p WITH(NOLOCK)
 	INNER JOIN '+@DbName+'.sys.tables AS t WITH(NOLOCK) 
-		ON t.object_id = i.object_id
+		ON t.object_id = p.object_id
+	INNER JOIN '+@DbName+'.sys.allocation_units a WITH(NOLOCK) 
+		ON p.partition_id = a.container_id
 	INNER JOIN '+@DbName+'.sys.Schemas s WITH(NOLOCK) 
 		ON t.schema_id = s.schema_id
 	WHERE 
