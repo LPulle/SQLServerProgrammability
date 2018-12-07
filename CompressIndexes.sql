@@ -4,12 +4,12 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /*------------------------------------------------------------------------------------------------------ 
-Description   : Identifies Indexes that are not compressed and compresses them
-				Tables where the indexes aren't compressed makes them continue to appear in CompressTables.sql
-				This is even if the table is compressed as it looks like something is still not compressed
-				So need to run this first
+Description   	Identifies Indexes that are not compressed and compresses them
+		Tables where the indexes aren't compressed makes them continue to appear in CompressTables.sql
+		This is even if the table is compressed as it looks like something is still not compressed
+		So need to run this first
 
-Usgage		  : EXEC dbo.CompressIndexes
+Usgage		EXEC dbo.CompressIndexes
 
                  
 Date			Version		Author		Comment
