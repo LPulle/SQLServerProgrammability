@@ -1,0 +1,16 @@
+logs
+*.log
+npm-debug.log*
+typings/
+.npm
+coverage
+.nyc_output
+.rpt2_cache
+build
+dist
+types
+node_modules
+.npm
+.vscode
+npm-debug.log
+package-lock.json
