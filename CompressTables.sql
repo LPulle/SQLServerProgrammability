@@ -4,20 +4,20 @@ SET QUOTED_IDENTIFIER ON
 GO
 
 /*------------------------------------------------------------------------------------------------------ 
-Description   : Identifies tables over a certain size for specific databases
-			  Parameter @AllowCompress is set to 1 by default and will result
-				in any tables found being compressed. If set to 0 will simply
-				report back that tables have been found that can be compressed.
-				Compression is done as PAGE rather than ROW level.
-				Tables will be rebuilt with this using an alter table statement.
-				Threshold is set to 100mb by default but can be changed in the
-				parameter @thresholdsize
+Description  	Identifies tables over a certain size for specific databases
+		Parameter @AllowCompress is set to 1 by default and will result
+		in any tables found being compressed. If set to 0 will simply
+		report back that tables have been found that can be compressed.
+		Compression is done as PAGE rather than ROW level.
+		Tables will be rebuilt with this using an alter table statement.
+		Threshold is set to 100mb by default but can be changed in the
+		parameter @thresholdsize
 
-Usgage: EXEC dbo.CompressTables
-				EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 100
-				EXEC dbo.CompressTables @AllowCompress = 0
-				EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 300
-				EXEC dbo.CompressTables @AllowCompress = 0, @thresholdsize = 300
+Usgage: 	EXEC dbo.CompressTables
+		EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 100
+		EXEC dbo.CompressTables @AllowCompress = 0
+		EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 300
+		EXEC dbo.CompressTables @AllowCompress = 0, @thresholdsize = 300
 
                  
 Date			Version		Author 		Comment
@@ -29,11 +29,10 @@ Date			Version		Author 		Comment
 
 --------------------------------------------------------------------------------------------------------- */
 CREATE PROCEDURE dbo.CompressTables (
-      @AllowCompress INT = 1, @thresholdsize INT = 100) 
-AS
+      @AllowCompress INT = 1, @thresholdsize INT = 100) AS
 BEGIN
-	SET NOCOUNT ON
 
+SET NOCOUNT ON
 -- Threshold for table size >= this size will be compressed
 	DECLARE 
 		@threshold INT = @thresholdsize
