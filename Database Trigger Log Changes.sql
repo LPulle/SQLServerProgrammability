@@ -1,15 +1,15 @@
 /*------------------------------------------------------------------------------------------------------ 
-Description   : Create a table and Database Trigger to log changes 
-				made to all objects and new objects created
-				Logs user, date and time of change and SQL executed
+Description   	Create a table and Database Trigger to log changes 
+		made to all objects and new objects created
+		Logs user, date and time of change and SQL executed
 
 Variation on original by Aaron Bertrand 2010-08-09:
 https://www.mssqltips.com/sqlservertip/2085/sql-server-ddl-triggers-to-track-all-database-changes/
                  
-Date			Version		Author		Comment
+Date		Version		Author		Comment
 ---------------------------------------------------------------------------------------------------------
-04-Aug-2015	    1.0			LP			First version
-07-Dec-2018		1.1			LP			Tidy up for sharing
+04-Aug-2015	1.0		LP		First version
+07-Dec-2018	1.1		LP		Tidy up for sharing
 --------------------------------------------------------------------------------------------------------- */
 
 -- Create the table for storing changes
