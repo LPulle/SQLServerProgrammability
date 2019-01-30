@@ -1,0 +1,70 @@
+# THIS IS ONLY FOR THE gitattributes REPOSITORY.
+# Handle line endings automatically for files detected as text
+# and leave all files detected as binary untouched.
+* text=auto
+
+# The above will handle all files NOT found below
+# These files are text and should be normalized (Convert crlf => lf)
+*.gitattributes text
+.gitignore text
+*.md text
+
+# baseline files need to retain crlf for cross plat tests that simulate sql tools service response
+*.txt text eol=crlf
+
+# language detects
+*.sql linguist-detectable=true
+*.sql linguist-language=sql
+*.ps1 linguist-detectable=true
+*.ps1 linguist-language=PowerShell
+
+# other file types
+*.doc  diff=astextplain
+*.DOC	diff=astextplain
+*.docx	diff=astextplain
+*.DOCX	diff=astextplain
+*.dot	diff=astextplain
+*.DOT	diff=astextplain
+*.pdf	diff=astextplain
+*.PDF	diff=astextplain
+*.rtf	diff=astextplain
+*.RTF	diff=astextplain
+
+*.jpg binary
+*.png binary
+*.gif binary
+
+*.cs -text diff=csharp 
+*.vb -text
+*.c -text
+*.cpp -text
+*.cxx -text
+*.h -text
+*.hxx -text
+*.py -text
+*.rb -text
+*.java -text
+*.html -text
+*.htm -text
+*.css -text
+*.scss -text
+*.sass -text
+*.less -text
+*.js -text
+*.lisp -text
+*.clj -text
+*.sql -text
+*.php -text
+*.lua -text
+*.m -text
+*.asm -text
+*.erl -text
+*.fs -text
+*.fsx -text
+*.hs -text
+
+*.csproj -text merge=union 
+*.vbproj -text merge=union 
+*.fsproj -text merge=union 
+*.dbproj -text merge=union 
+*.sln -text merge=union 
