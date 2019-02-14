@@ -40,6 +40,7 @@ SET @LogId=SCOPE_IDENTITY();
 		,@sqlcommand1 VARCHAR(MAX)
 		,@i INT
 		,@j INT
+		,@k INT
       		,@sqlcommand VARCHAR(MAX)
 		,@Table VARCHAR(MAX);
 
@@ -125,6 +126,7 @@ END
 		-- reuse @i and @j as variables
 		SET @i = (SELECT MIN(IndexID) FROM #IndexesCompress)
 		SET @j = (SELECT MAX(IndexID) FROM #IndexesCompress)
+		SET @k = (SELECT COUNT(*) FROM #IndexesCompress)
 		-- Start Loop
 		WHILE @i <= @j
 			BEGIN
@@ -135,15 +137,15 @@ END
 				EXEC(@sqlcommand)
 				SET @i += 1
 			END;
-		RAISERROR('Indexes Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
+		RAISERROR('Indexes Compressed ... %i', 0, 1, @k)  WITH NOWAIT;
 	END;
 
 -- For Logging Part 2 - record final time stamp and records updated
-SET @EndDate = GETDATE()
-UPDATE ETL.dbo.ETLLogsStats
-SET
-	EndDateTime = @EndDate,
-	TotalUpdates = @records
-WHERE ETLLogId = @LogId
+	SET @EndDate = GETDATE()
+	UPDATE ETL.dbo.ETLLogsStats
+	SET
+		EndDateTime = @EndDate,
+		TotalUpdates = @records
+	WHERE ETLLogId = @LogId
 
 END
