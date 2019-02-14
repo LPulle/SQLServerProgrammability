@@ -9,7 +9,7 @@ Description   	Identifies Indexes that are not compressed and compresses them
 		This is even if the table is compressed as it looks like something is still not compressed
 		So need to run this first
 
-Usgage		EXEC dbo.CompressIndexes
+Usage		EXEC dbo.CompressIndexes
 
                  
 Date			Version		Author		Comment
@@ -22,6 +22,16 @@ CREATE PROCEDURE dbo.CompressIndexes AS
 BEGIN 
 
 SET NOCOUNT ON
+
+-- For Logging
+DECLARE @LogId INT;
+DECLARE @CreateDate DATETIME = GETDATE();
+DECLARE @EndDate DATETIME;
+DECLARE @ProcName VARCHAR(50) = (SELECT OBJECT_SCHEMA_NAME(@@PROCID) + '.' + OBJECT_NAME(@@PROCID));
+
+INSERT INTO UrgentCare.dbo.ETLLogsStats (StartDateTime, PackageName)
+SELECT @CreateDate, @ProcName;
+SET @LogId=SCOPE_IDENTITY();
 
 -- Variables for loop
 	DECLARE @Databases TABLE (DatabaseID INT IDENTITY, DatabaseName VARCHAR(100));
@@ -127,4 +137,13 @@ END
 			END;
 		RAISERROR('Indexes Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
 	END;
+
+-- For Logging Part 2 - record final time stamp and records updated
+SET @EndDate = GETDATE()
+UPDATE UrgentCare.dbo.ETLLogsStats
+SET
+	EndDateTime = @EndDate,
+	TotalUpdates = @records
+WHERE ETLLogId = @LogId
+
 END

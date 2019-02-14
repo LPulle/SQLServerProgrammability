@@ -13,7 +13,7 @@ Description  	Identifies tables over a certain size for specific databases
 		Threshold is set to 100mb by default but can be changed in the
 		parameter @thresholdsize
 
-Usgage: 	EXEC dbo.CompressTables
+Usage: 	EXEC dbo.CompressTables
 		EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 100
 		EXEC dbo.CompressTables @AllowCompress = 0
 		EXEC dbo.CompressTables @AllowCompress = 1, @thresholdsize = 300
@@ -33,6 +33,17 @@ CREATE PROCEDURE dbo.CompressTables (
 BEGIN
 
 SET NOCOUNT ON
+
+-- For Logging
+DECLARE @LogId INT;
+DECLARE @CreateDate DATETIME = GETDATE();
+DECLARE @EndDate DATETIME;
+DECLARE @ProcName VARCHAR(50) = (SELECT OBJECT_SCHEMA_NAME(@@PROCID) + '.' + OBJECT_NAME(@@PROCID));
+
+INSERT INTO ETL.dbo.ETLLogsStats (StartDateTime, PackageName)
+SELECT @CreateDate, @ProcName;
+SET @LogId=SCOPE_IDENTITY();
+
 -- Threshold for table size >= this size will be compressed
 	DECLARE 
 		@threshold INT = @thresholdsize
@@ -148,4 +159,11 @@ DELETE FROM #TablesCompress WHERE TotalSpaceMB < @thresholdsize;
 			RAISERROR('Tables Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
 		END;
 	END;
+-- For Logging Part 2 - record final time stamp and records updated
+SET @EndDate = GETDATE()
+UPDATE UrgentCare.dbo.ETLLogsStats
+SET	EndDateTime = @EndDate,
+	TotalUpdates = @records
+WHERE ETLLogId = @LogId
+
 END
