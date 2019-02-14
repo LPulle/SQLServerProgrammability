@@ -140,7 +140,7 @@ END
 
 -- For Logging Part 2 - record final time stamp and records updated
 SET @EndDate = GETDATE()
-UPDATE UrgentCare.dbo.ETLLogsStats
+UPDATE ETL.dbo.ETLLogsStats
 SET
 	EndDateTime = @EndDate,
 	TotalUpdates = @records
