@@ -46,18 +46,19 @@ SET @LogId=SCOPE_IDENTITY();
 
 -- Threshold for table size >= this size will be compressed
 	DECLARE 
-		@threshold INT = @thresholdsize
-		,@Compress INT = @AllowCompress;
+		@threshold INT = @thresholdsize,
+		@Compress INT = @AllowCompress;
 
 -- Variables for loop
 	DECLARE @Databases TABLE (DatabaseID INT IDENTITY, DatabaseName VARCHAR(100));
 	DECLARE 
-		@DbName VARCHAR(100)
-		,@sqlcommand1 VARCHAR(MAX)
-		,@i INT
-		,@j INT
-      		,@sqlcommand VARCHAR(MAX)
-      		,@Table VARCHAR(MAX);
+		@DbName VARCHAR(100),
+		@sqlcommand1 VARCHAR(MAX),
+		@i INT,
+		@j INT,
+		@k INT,
+      		@sqlcommand VARCHAR(MAX),
+      		@Table VARCHAR(MAX);
 
 -- Create a table for storing table information
 IF OBJECT_ID('tempdb..#TablesCompress') IS NOT NULL DROP TABLE #TablesCompress
@@ -138,7 +139,7 @@ DELETE FROM #TablesCompress WHERE TotalSpaceMB < @thresholdsize;
 	BEGIN
 		IF @Compress != 1
 			BEGIN
-				RAISERROR('Tables can be Compressed ... %i', 0, 1, @Compress)  WITH NOWAIT;
+				RAISERROR('Tables can be Compressed ... %i', 0, 1, @records)  WITH NOWAIT;
 			END
 		IF @Compress = 1
 		BEGIN
@@ -146,6 +147,7 @@ DELETE FROM #TablesCompress WHERE TotalSpaceMB < @thresholdsize;
         		-- reuse @i and @j as variables
 			SET @i = (SELECT MIN(TableID) FROM #TablesCompress);
 			SET @j = (SELECT MAX(TableID) FROM #TablesCompress);
+			SET @k = (SELECT COUNT(*) FROM #TablesCompress)
 			-- Start Loop to compress tables
 			WHILE @i <= @j
 				BEGIN
@@ -156,14 +158,14 @@ DELETE FROM #TablesCompress WHERE TotalSpaceMB < @thresholdsize;
 					EXEC(@sqlcommand)
 					SET @i += 1
 				END;
-			RAISERROR('Tables Compressed ... %i', 0, 1, @j)  WITH NOWAIT;
+			RAISERROR('Tables Compressed ... %i', 0, 1, @k)  WITH NOWAIT;
 		END;
 	END;
 -- For Logging Part 2 - record final time stamp and records updated
-SET @EndDate = GETDATE()
-UPDATE ETL.dbo.ETLLogsStats
-SET	EndDateTime = @EndDate,
-	TotalUpdates = @records
-WHERE ETLLogId = @LogId
+	SET @EndDate = GETDATE()
+	UPDATE ETL.dbo.ETLLogsStats
+	SET	EndDateTime = @EndDate,
+		TotalUpdates = @records
+	WHERE ETLLogId = @LogId
 
 END
