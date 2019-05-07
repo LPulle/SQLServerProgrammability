@@ -28,6 +28,6 @@ IF OBJECT_ID(N'tempdb..#temp', N'U') IS NOT NULL DROP TABLE #temp;
 DECLARE @sql NVARCHAR(MAX)
 SELECT @sql = ISNULL(@sql+';', '') + 'DROP TABLE ' + QUOTENAME(name)
 FROM tempdb..sysobjects
-WHERE name LIKE '#%'
+WHERE name LIKE '#%' AND name NOT LIKE '##%'
 EXEC (@sql);
  
