@@ -29,7 +29,7 @@ DECLARE @CreateDate DATETIME = GETDATE();
 DECLARE @EndDate DATETIME;
 DECLARE @ProcName VARCHAR(50) = (SELECT OBJECT_SCHEMA_NAME(@@PROCID) + '.' + OBJECT_NAME(@@PROCID));
 
-INSERT INTO UrgentCare.dbo.ETLLogsStats (StartDateTime, PackageName)
+INSERT INTO ETL.dbo.ETLLogsStats (StartDateTime, PackageName)
 SELECT @CreateDate, @ProcName;
 SET @LogId=SCOPE_IDENTITY();
 
