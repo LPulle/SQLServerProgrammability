@@ -10,6 +10,7 @@ Date		Version		Author		Comment
 ---------------------------------------------------------------------------------------------------------
 04-Aug-2015	1.0		LP		First version
 07-Dec-2018	1.1		LP		Tidy up for sharing
+20-Jun-2019	1.2		LP		Added NewObjectName field for tracking renamed objects
 --------------------------------------------------------------------------------------------------------- */
 
 -- Create the table for storing changes
@@ -22,6 +23,7 @@ CREATE TABLE dbo.DDLEvents (
 	DatabaseName NVARCHAR(255) NULL,
 	SchemaName NVARCHAR(255) NULL,
 	ObjectName NVARCHAR(255) NULL,
+	NewObjectName NVARCHAR(255) NULL,
 	HostName VARCHAR(64) NULL,
 	ProgramName NVARCHAR(255) NULL,
 	LoginName NVARCHAR(255) NULL
@@ -80,6 +82,7 @@ BEGIN
         DatabaseName,
         SchemaName,
         ObjectName,
+        NewObjectName,
         HostName,
         ProgramName,
         LoginName
@@ -91,6 +94,7 @@ BEGIN
         DB_NAME(),
         @EventData.value('(/EVENT_INSTANCE/SchemaName)1',  'NVARCHAR(255)'), 
         @EventData.value('(/EVENT_INSTANCE/ObjectName)1',  'NVARCHAR(255)'),
+	ISNULL(@EventData.value('(/EVENT_INSTANCE/NewObjectName)[1]',  'NVARCHAR(255)'), @EventData.value('(/EVENT_INSTANCE/ObjectName)[1]',  'NVARCHAR(255)')),
         HOST_NAME(),
         PROGRAM_NAME(),
         SUSER_SNAME();
