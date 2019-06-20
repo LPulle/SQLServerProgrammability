@@ -16,6 +16,7 @@ Date			Version		Author		Comment
 ---------------------------------------------------------------------------------------------------------
 24-Jul-2018	     	1.0		LP		First version
 06-Dec-2018		1.1		LP		Changed population of #IndexCompress to while loop
+
 --------------------------------------------------------------------------------------------------------- */
 
 CREATE PROCEDURE dbo.CompressIndexes AS 
@@ -82,11 +83,11 @@ BEGIN
 		p.data_compression, 
 		p.data_compression_desc
 		FROM '
-		+@DbName+'.sys.partitions AS p WITH(NOLOCK)
+		@DbName+'.sys.indexes AS i WITH(NOLOCK)
+		INNER JOIN '+@DbName+'.sys.partitions AS p WITH(NOLOCK) 
+			ON i.object_id = p.object_id AND i.index_id = p.index_id
 		INNER JOIN '+@DbName+'.sys.tables AS t WITH(NOLOCK) 
-			ON t.object_id = p.object_id
-		INNER JOIN '+@DbName+'.sys.allocation_units a WITH(NOLOCK) 
-			ON p.partition_id = a.container_id
+			ON t.object_id = i.object_id
 		INNER JOIN '+@DbName+'.sys.Schemas s WITH(NOLOCK) 
 			ON t.schema_id = s.schema_id
 		WHERE 
