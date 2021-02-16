@@ -57,6 +57,7 @@ RAISERROR('Databases to be investigated ... %s', 0, 1, @Databases) WITH NOWAIT;
 CREATE TABLE #Tables (
 	DatabaseName VARCHAR(MAX)
 	,TableName VARCHAR(MAX)
+	,SchemaName VARCHAR(MAX)
 	,PartitionNumber BIGINT
 	,DataCompressionDesc NVarchar(120)
 	,TotalSpaceMB INT
@@ -72,13 +73,14 @@ CREATE TABLE #Tables (
 RAISERROR('Identifying all tables and space used ...', 0, 1) WITH NOWAIT;
 SET @sqlcommand1 = 
 'USE [?]; INSERT INTO #Tables 
-SELECT Db_Name() AS DatabaseName, t.name AS TableName, p.partition_number, 
+SELECT Db_Name() AS DatabaseName, t.name AS TableName, s.name AS SchemaName, p.partition_number, 
 p.data_compression_desc, SUM(a.total_pages) * 8 / 1024 AS TotalSpaceMB
 FROM sys.partitions AS p
 INNER JOIN sys.tables AS t ON t.object_id = p.object_id
+INNER JOIN sys.schemas AS s ON t.schema_id = s.schema_id
 INNER JOIN sys.allocation_units a ON p.partition_id = a.container_id
 AND ''?'' IN (SELECT DatabaseName FROM #Databases)
-GROUP BY t.name, p.partition_number, p.data_compression_desc';
+GROUP BY t.name, s.name, p.partition_number, p.data_compression_desc';
 
 -- Exec the above SQL Command inserting into #temp
 EXEC @RETURN_VALUE = sp_MSforeachdb @sqlcommand1;
