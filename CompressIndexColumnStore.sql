@@ -83,7 +83,7 @@ VALUES ('Database1'),('Database2'),('Database3'),('Database4');
 SET @i = 1;
 SET @j = (SELECT MAX(DatabaseID) FROM @Databases);
 
--- Get all tables currently without compression over threshold size for each database
+-- Get all tables currently with page compression without a clustered index over threshold size for each database
 WHILE @i <= @j
 BEGIN
 	SET @DbName = (SELECT DatabaseName FROM @Databases WHERE DatabaseID = @i)
@@ -182,7 +182,7 @@ INNER JOIN
 FROM #TablesCompress) t2
 ON t.TableID = t2.TableID
 
--- Generate a SQL statemenet for each table to do columnstore index and hence compression
+-- Generate a SQL statemenet for each table to do clustered columnstore index which will also compress the table
 	UPDATE t
 	SET SQLStatement = 
 		'USE '
