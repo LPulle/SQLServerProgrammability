@@ -75,14 +75,14 @@ BEGIN
 	SET @sqlcommand1 =
 	'INSERT #IndexesCompress  (DatabaseName, IndexName, TableName, DatabaseSchema, DataCompressionCode, DataCompressionDesc)
 	SELECT ' + '''' +
-	@DbName +
+	@DbName
 	+ ''' AS DatabaseName,' +
 	+'i.name AS IndexName,
 		t.name AS TableName, 
 		s.name AS DatabaseSchema,
 		p.data_compression, 
 		p.data_compression_desc
-		FROM '
+		FROM ' +
 		@DbName+'.sys.indexes AS i WITH(NOLOCK)
 		INNER JOIN '+@DbName+'.sys.partitions AS p WITH(NOLOCK) 
 			ON i.object_id = p.object_id AND i.index_id = p.index_id
